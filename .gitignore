@@ -1,0 +1,12 @@
+# Maven
+target/
+
+# IntelliJ
+.idea/
+*.iml
+
+# Variables d'environnement
+.env
+
+# Dumps SQL (données sensibles)
+init/
