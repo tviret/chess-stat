@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess Stats 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0c;
+      --bg2: #141414;
+      --bg3: #1c1c1c;
+      --border: #2a2a2a;
+      --border2: #3a3a3a;
+      --text: #e8e4dc;
+      --muted: #666;
+      --accent: #c9a84c;
+      --accent2: #8b6914;
+      --green: #4a9e6b;
+      --red: #9e4a4a;
+      --blue: #4a7a9e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+    }
+
+    header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    header span {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: calc(100vh - 73px);
+    }
+
+    /* SIDEBAR FILTRES */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-section input,
+    .filter-section select {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      padding: 8px 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .filter-section input:focus,
+    .filter-section select:focus {
+      border-color: var(--accent);
+    }
+
+    .filter-section select option {
+      background: var(--bg2);
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .range-row input { text-align: center; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: #e0b85a; }
+
+    .btn-reset {
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover { border-color: var(--border2); color: var(--text); }
+
+    /* MAIN */
+    main {
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 8px 20px;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+    }
+
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* PANELS */
+    .panel { display: none; }
+    .panel.active { display: flex; flex-direction: column; gap: 12px; }
+
+    /* STATS CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-card .label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .stat-card .value {
+      font-family: 'Fraunces', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--accent);
+    }
+
+    .stat-card .sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* TABLE */
+    .table-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 10px 14px;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-count {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 2px 8px;
+      font-size: 0.68rem;
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 8px 14px;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg3); }
+
+    tbody td {
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .badge-green { background: #0d2b18; color: var(--green); }
+    .badge-red   { background: #2b0d0d; color: var(--red); }
+    .badge-blue  { background: #0d1e2b; color: var(--blue); }
+    .badge-gold  { background: #2b2008; color: var(--accent); }
+
+    .result-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      width: 100px;
+      gap: 1px;
+    }
+
+    .result-bar .w { background: var(--green); }
+    .result-bar .d { background: var(--muted); }
+    .result-bar .l { background: var(--red); }
+
+    /* EMPTY / LOADING */
+    .empty {
+      padding: 3rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    .empty .icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      opacity: 0.3;
+    }
+
+    /* DETAIL PANEL */
+    .detail-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      display: none;
+    }
+
+    .detail-panel.visible { display: block; }
+
+    .detail-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      font-weight: 300;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .ouvertures-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 1rem;
+    }
+
+    .ouv-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: var(--bg3);
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+
+    .ouv-eco {
+      font-size: 0.65rem;
+      color: var(--accent);
+      min-width: 36px;
+      letter-spacing: 1px;
+    }
+
+    .ouv-name { flex: 1; color: var(--text); }
+    .ouv-nb { color: var(--muted); font-size: 0.72rem; min-width: 60px; text-align: right; }
+
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      flex: 1;
+      max-width: 80px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>♟ Chess Stats</h1>
+  <span>2026 — Statistiques & Analyses</span>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="filter-section">
+      <div class="filter-label">Joueur</div>
+      <input type="text" id="f-joueur" placeholder="Nom du joueur..." />
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">Pays</div>
+      <select id="f-pays">
+        <option value="">Tous les pays</option>
+      </select>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">Tournoi</div>
+      <select id="f-tournoi">
+        <option value="">Tous les tournois</option>
+      </select>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">ELO</div>
+      <div class="range-row">
+        <input type="number" id="f-elo-min" placeholder="Min" min="1000" max="3000" />
+        <input type="number" id="f-elo-max" placeholder="Max" min="1000" max="3000" />
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">Période</div>
+      <input type="date" id="f-date-debut" />
+      <input type="date" id="f-date-fin" />
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">Résultat</div>
+      <select id="f-resultat">
+        <option value="">Tous</option>
+        <option value="1">Victoire blancs</option>
+        <option value="0">Nulle</option>
+        <option value="-1">Victoire noirs</option>
+      </select>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">Couleur jouée</div>
+      <select id="f-couleur">
+        <option value="">Les deux</option>
+        <option value="blancs">Blancs</option>
+        <option value="noirs">Noirs</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" onclick="applyFilters()">Rechercher</button>
+    <button class="btn-reset" onclick="resetFilters()">Réinitialiser</button>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('joueurs')">Joueurs</div>
+      <div class="tab" onclick="switchTab('tournois')">Tournois</div>
+      <div class="tab" onclick="switchTab('ouvertures')">Ouvertures</div>
+    </div>
+
+    <!-- PANEL JOUEURS -->
+    <div id="panel-joueurs" class="panel active">
+      <div class="stats-grid" id="stats-joueur" style="display:none"></div>
+      <div class="detail-panel" id="detail-joueur"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span>Joueurs</span>
+          <span class="table-count" id="count-joueurs">—</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Pays</th>
+              <th>ELO moyen</th>
+              <th>Parties</th>
+              <th>Résultats</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-joueurs">
+            <tr><td colspan="5"><div class="empty"><span class="icon">♟</span>Lance une recherche pour afficher les joueurs</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANEL TOURNOIS -->
+    <div id="panel-tournois" class="panel">
+      <div class="detail-panel" id="detail-tournoi"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span>Tournois</span>
+          <span class="table-count" id="count-tournois">—</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Date</th>
+              <th>Pays</th>
+              <th>Joueurs</th>
+              <th>Parties</th>
+              <th>ELO moyen</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-tournois">
+            <tr><td colspan="6"><div class="empty"><span class="icon">♟</span>Lance une recherche pour afficher les tournois</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANEL OUVERTURES -->
+    <div id="panel-ouvertures" class="panel">
+      <div class="table-wrap">
+        <div class="table-header">
+          <span>Ouvertures les plus jouées</span>
+          <span class="table-count" id="count-ouvertures">—</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ECO</th>
+              <th>Ouverture</th>
+              <th>Parties</th>
+              <th>Victoires</th>
+              <th>Nulles</th>
+              <th>Défaites</th>
+              <th>Taux victoire</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-ouvertures">
+            <tr><td colspan="7"><div class="empty"><span class="icon">♟</span>Sélectionne un joueur ou un pays pour afficher les ouvertures</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const API = 'http://localhost:8080';
+  let allTournois = [];
+
+  async function get(path) {
+    const res = await fetch(API + path);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) =>
+      t.classList.toggle('active', ['joueurs','tournois','ouvertures'][i] === name));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  // Charger les selects au démarrage
+  async function init() {
+    try {
+      const pays = await get('/api/pays');
+      const sel = document.getElementById('f-pays');
+      pays.sort((a,b) => a.nom.localeCompare(b.nom)).forEach(p => {
+        sel.innerHTML += `<option value="${p.code}">${p.nom} (${p.code.toUpperCase()})</option>`;
+      });
+    } catch(e) { console.warn('Pays non chargés:', e.message); }
+
+    try {
+      allTournois = await get('/api/tournois');
+      const sel = document.getElementById('f-tournoi');
+      allTournois.sort((a,b) => a.nom.localeCompare(b.nom)).forEach(t => {
+        sel.innerHTML += `<option value="${t.id}">${t.nom}</option>`;
+      });
+    } catch(e) { console.warn('Tournois non chargés:', e.message); }
+  }
+
+  async function applyFilters() {
+    const joueur  = document.getElementById('f-joueur').value.trim();
+    const pays    = document.getElementById('f-pays').value;
+    const tournoi = document.getElementById('f-tournoi').value;
+    const eloMin  = document.getElementById('f-elo-min').value;
+    const eloMax  = document.getElementById('f-elo-max').value;
+    const debut   = document.getElementById('f-date-debut').value;
+    const fin     = document.getElementById('f-date-fin').value;
+
+    // Panel joueurs
+    try {
+      let url = '/api/joueurs';
+      if (joueur) url += '?nom=' + encodeURIComponent(joueur);
+      else if (pays) url += '?pays=' + pays;
+      const joueurs = await get(url);
+      renderJoueurs(joueurs);
+    } catch(e) { renderError('tbody-joueurs', 5, e.message); }
+
+    // Panel tournois
+    try {
+      let url = '/api/tournois';
+      if (pays) url += '?pays=' + pays;
+      else if (debut && fin) url += '?debut=' + debut + '&fin=' + fin;
+      const tournois = await get(url);
+      renderTournois(tournois);
+    } catch(e) { renderError('tbody-tournois', 6, e.message); }
+
+    // Panel ouvertures
+    try {
+      if (joueur) {
+        const ouv = await get('/api/joueurs/' + encodeURIComponent(joueur) + '/ouvertures?detail=true');
+        renderOuvertures(ouv);
+      } else if (pays) {
+        const ouv = await get('/api/stats/ouvertures?pays=' + pays);
+        renderOuvertures(ouv);
+      } else {
+        document.getElementById('tbody-ouvertures').innerHTML =
+          '<tr><td colspan="7"><div class="empty"><span class="icon">♟</span>Sélectionne un joueur ou un pays</div></td></tr>';
+        document.getElementById('count-ouvertures').textContent = '—';
+      }
+    } catch(e) { renderError('tbody-ouvertures', 7, e.message); }
+  }
+
+  function renderJoueurs(joueurs) {
+    const tbody = document.getElementById('tbody-joueurs');
+    document.getElementById('count-joueurs').textContent = joueurs.length;
+    if (!joueurs.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><span class="icon">♟</span>Aucun joueur trouvé</div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = joueurs.map(j => `
+      <tr class="fade-in" onclick="loadJoueurStats('${j.nomComplet.replace(/'/g,"\\'")}')">
+        <td>${j.nomComplet}</td>
+        <td>${j.pays ? '<span class="badge badge-blue">' + j.pays.code.toUpperCase() + '</span>' : '—'}</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+    `).join('');
+  }
+
+  async function loadJoueurStats(nom) {
+    try {
+      const stats = await get('/api/joueurs/' + encodeURIComponent(nom) + '/stats');
+      const ouv   = await get('/api/joueurs/' + encodeURIComponent(nom) + '/ouvertures?detail=true');
+
+      const total = stats.nbParties || 0;
+      const pw = total > 0 ? Math.round(stats.nbVictoires / total * 100) : 0;
+      const pd = total > 0 ? Math.round(stats.nbNulles    / total * 100) : 0;
+      const pl = total > 0 ? Math.round(stats.nbDefaites  / total * 100) : 0;
+      const maxOuv = ouv[0]?.nbParties || 1;
+
+      const panel = document.getElementById('detail-joueur');
+      panel.className = 'detail-panel visible fade-in';
+      panel.innerHTML = `
+        <div class="detail-title">${stats.nomComplet}${stats.pays ? ' · ' + stats.pays.code.toUpperCase() : ''}</div>
+        <div class="detail-grid">
+          <div class="stat-card">
+            <div class="label">Parties</div>
+            <div class="value">${stats.nbParties}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Victoires</div>
+            <div class="value" style="color:var(--green)">${stats.nbVictoires}</div>
+            <div class="sub">${pw}%</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Nulles</div>
+            <div class="value" style="color:var(--muted)">${stats.nbNulles}</div>
+            <div class="sub">${pd}%</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Défaites</div>
+            <div class="value" style="color:var(--red)">${stats.nbDefaites}</div>
+            <div class="sub">${pl}%</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">ELO moyen</div>
+            <div class="value">${stats.eloMoyen || '—'}</div>
+          </div>
+        </div>
+        <div class="filter-label" style="margin-top:1rem;margin-bottom:8px">Ouvertures favorites</div>
+        <div class="ouvertures-list">
+          ${ouv.slice(0, 8).map(o => `
+            <div class="ouv-row">
+              <span class="ouv-eco">${o.codeEco}</span>
+              <span class="ouv-name">${o.libelle}</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:${Math.round(o.nbParties/maxOuv*100)}%"></div>
+              </div>
+              <span class="ouv-nb">${o.nbParties} parties</span>
+              ${o.tauxVictoire != null ? '<span class="badge badge-gold">' + o.tauxVictoire + '%</span>' : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // Mettre à jour la ligne du tableau
+      const rows = document.querySelectorAll('#tbody-joueurs tr');
+      rows.forEach(row => {
+        if (row.querySelector('td')?.textContent === nom) {
+          const cells = row.querySelectorAll('td');
+          cells[2].textContent = stats.eloMoyen || '—';
+          cells[3].textContent = stats.nbParties;
+          cells[4].innerHTML = `
+            <div class="result-bar">
+              <div class="w" style="width:${pw}%"></div>
+              <div class="d" style="width:${pd}%"></div>
+              <div class="l" style="width:${pl}%"></div>
+            </div>
+          `;
+        }
+      });
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  function renderTournois(tournois) {
+    const tbody = document.getElementById('tbody-tournois');
+    document.getElementById('count-tournois').textContent = tournois.length;
+    if (!tournois.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><span class="icon">♟</span>Aucun tournoi trouvé</div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = tournois.map(t => `
+      <tr class="fade-in" onclick="loadTournoiStats(${t.id}, '${t.nom.replace(/'/g,"\\'")}')">
+        <td>${t.nom}</td>
+        <td>${t.date || '—'}</td>
+        <td>${t.pays ? '<span class="badge badge-blue">' + t.pays.code.toUpperCase() + '</span>' : '—'}</td>
+        <td>${t.nbrJoueurs ?? '—'}</td>
+        <td>${t.nbrParties ?? '—'}</td>
+        <td>${t.classementMoyen ?? '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  async function loadTournoiStats(id, nom) {
+    try {
+      const stats = await get('/api/tournois/' + id + '/stats');
+      const total = (stats.nbVictoiresBlancs || 0) + (stats.nbVictoiresNoirs || 0) + (stats.nbNulles || 0);
+      const maxOuv = stats.topOuvertures?.[0]?.nbParties || 1;
+
+      const panel = document.getElementById('detail-tournoi');
+      panel.className = 'detail-panel visible fade-in';
+      panel.innerHTML = `
+        <div class="detail-title">${stats.nom} · ${stats.date || ''}</div>
+        <div class="detail-grid">
+          <div class="stat-card">
+            <div class="label">Parties</div>
+            <div class="value">${total}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Blancs gagnent</div>
+            <div class="value" style="color:var(--text)">${stats.nbVictoiresBlancs}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Noirs gagnent</div>
+            <div class="value" style="color:var(--muted)">${stats.nbVictoiresNoirs}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Nulles</div>
+            <div class="value" style="color:var(--muted)">${stats.nbNulles}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Joueurs</div>
+            <div class="value">${stats.nbrJoueurs ?? '—'}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">ELO moyen</div>
+            <div class="value">${stats.classementMoyen ?? '—'}</div>
+          </div>
+        </div>
+        ${stats.topOuvertures?.length ? `
+          <div class="filter-label" style="margin-top:1rem;margin-bottom:8px">Top ouvertures du tournoi</div>
+          <div class="ouvertures-list">
+            ${stats.topOuvertures.slice(0, 8).map(o => `
+              <div class="ouv-row">
+                <span class="ouv-eco">${o.codeEco}</span>
+                <span class="ouv-name">${o.libelle}</span>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width:${Math.round(o.nbParties/maxOuv*100)}%"></div>
+                </div>
+                <span class="ouv-nb">${o.nbParties} parties</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      `;
+    } catch(e) { console.error(e); }
+  }
+
+  function renderOuvertures(ouvertures) {
+    const tbody = document.getElementById('tbody-ouvertures');
+    document.getElementById('count-ouvertures').textContent = ouvertures.length;
+    if (!ouvertures.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><span class="icon">♟</span>Aucune ouverture trouvée</div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = ouvertures.map(o => `
+      <tr class="fade-in">
+        <td><span class="badge badge-gold">${o.codeEco}</span></td>
+        <td>${o.libelle}</td>
+        <td>${o.nbParties}</td>
+        <td>${o.nbVictoires ?? '—'}</td>
+        <td>${o.nbNulles ?? '—'}</td>
+        <td>${o.nbDefaites ?? '—'}</td>
+        <td>${o.tauxVictoire != null ? o.tauxVictoire + '%' : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderError(tbodyId, cols, msg) {
+    document.getElementById(tbodyId).innerHTML =
+      `<tr><td colspan="${cols}"><div class="empty"><span class="icon">⚠</span>${msg}</div></td></tr>`;
+  }
+
+  function resetFilters() {
+    ['f-joueur','f-elo-min','f-elo-max','f-date-debut','f-date-fin'].forEach(id =>
+      document.getElementById(id).value = '');
+    ['f-pays','f-tournoi','f-resultat','f-couleur'].forEach(id =>
+      document.getElementById(id).selectedIndex = 0);
+    document.getElementById('detail-joueur').className = 'detail-panel';
+    document.getElementById('detail-tournoi').className = 'detail-panel';
+  }
+
+  init();
+</script>
+
+</body>
+</html>
