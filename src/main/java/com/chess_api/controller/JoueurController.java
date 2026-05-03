@@ -18,19 +18,23 @@ import java.util.List;
 public class JoueurController {
 
     private final JoueurService joueurService;
-    private final StatsService statsService;
+    private final StatsService  statsService;
 
     // GET /api/joueurs
     // GET /api/joueurs?nom=Magnus
     // GET /api/joueurs?pays=no
+    // GET /api/joueurs?tournoi=3
+    // GET /api/joueurs?eloMin=2500&eloMax=2800
+    // GET /api/joueurs?pays=no&tournoi=3&eloMin=2500   ← combinaisons
     @GetMapping
     public ResponseEntity<List<JoueurDto>> findAll(
-            @RequestParam(required = false) String nom,
-            @RequestParam(required = false) String pays
+            @RequestParam(required = false) String  nom,
+            @RequestParam(required = false) String  pays,
+            @RequestParam(required = false) Long    tournoi,
+            @RequestParam(required = false) Integer eloMin,
+            @RequestParam(required = false) Integer eloMax
     ) {
-        if (nom != null)  return ResponseEntity.ok(joueurService.search(nom));
-        if (pays != null) return ResponseEntity.ok(joueurService.findByPays(pays));
-        return ResponseEntity.ok(joueurService.findAll());
+        return ResponseEntity.ok(joueurService.search(nom, pays, tournoi, eloMin, eloMax));
     }
 
     // GET /api/joueurs/{nomComplet}/stats
@@ -39,16 +43,13 @@ public class JoueurController {
         return ResponseEntity.ok(joueurService.getStats(nomComplet));
     }
 
-    // GET /api/joueurs/{nomComplet}/ouvertures
-    // GET /api/joueurs/{nomComplet}/ouvertures?detail=true  (avec taux de victoire)
+    // GET /api/joueurs/{nomComplet}/ouvertures?detail=true
     @GetMapping("/{nomComplet}/ouvertures")
     public ResponseEntity<List<OuvertureStatsDto>> getOuvertures(
             @PathVariable String nomComplet,
             @RequestParam(required = false, defaultValue = "false") boolean detail
     ) {
-        if (detail) {
-            return ResponseEntity.ok(statsService.getOuverturesStatsForJoueur(nomComplet));
-        }
+        if (detail) return ResponseEntity.ok(statsService.getOuverturesStatsForJoueur(nomComplet));
         return ResponseEntity.ok(statsService.getTopOuverturesByJoueur(nomComplet));
     }
 }

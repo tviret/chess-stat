@@ -22,18 +22,16 @@ public class TournoiController {
     // GET /api/tournois
     // GET /api/tournois?nom=Open
     // GET /api/tournois?pays=fr
-    // GET /api/tournois?debut=2026-01-01&fin=2026-06-30
+    // GET /api/tournois?debut=2024-01-01&fin=2024-12-31
+    // GET /api/tournois?pays=fr&debut=2024-01-01   ← combinaisons
     @GetMapping
     public ResponseEntity<List<TournoiDto>> findAll(
-            @RequestParam(required = false) String nom,
-            @RequestParam(required = false) String pays,
+            @RequestParam(required = false) String    nom,
+            @RequestParam(required = false) String    pays,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin
     ) {
-        if (nom != null)                    return ResponseEntity.ok(tournoiService.search(nom));
-        if (pays != null)                   return ResponseEntity.ok(tournoiService.findByPays(pays));
-        if (debut != null && fin != null)   return ResponseEntity.ok(tournoiService.findByDateRange(debut, fin));
-        return ResponseEntity.ok(tournoiService.findAll());
+        return ResponseEntity.ok(tournoiService.search(nom, pays, debut, fin));
     }
 
     // GET /api/tournois/{id}/stats

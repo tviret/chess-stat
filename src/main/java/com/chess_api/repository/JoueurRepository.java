@@ -14,8 +14,20 @@ public interface JoueurRepository extends JpaRepository<Joueur, Long> {
 
     Optional<Joueur> findByNomComplet(String nomComplet);
 
-    List<Joueur> findByPaysCode(String codePays);
-
-    @Query("SELECT j FROM Joueur j WHERE LOWER(j.nomComplet) LIKE LOWER(CONCAT('%', :nom, '%'))")
-    List<Joueur> searchByNom(@Param("nom") String nom);
+    @Query("""
+        SELECT DISTINCT j FROM Joueur j
+        LEFT JOIN Participation p ON p.joueur = j
+        WHERE (:nom     IS NULL OR LOWER(j.nomComplet) LIKE LOWER(CONCAT('%', :nom, '%')))
+        AND   (:pays    IS NULL OR j.pays.code = :pays)
+        AND   (:tournoi IS NULL OR p.tournoi.id = :tournoi)
+        AND   (:eloMin  IS NULL OR p.elo >= :eloMin)
+        AND   (:eloMax  IS NULL OR p.elo <= :eloMax)
+        """)
+    List<Joueur> search(
+        @Param("nom")     String nom,
+        @Param("pays")    String pays,
+        @Param("tournoi") Long   tournoi,
+        @Param("eloMin")  Integer eloMin,
+        @Param("eloMax")  Integer eloMax
+    );
 }

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess Stats</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header>
+    <h1 onclick="resetAll()">♟ Chess Stats</h1>
+    <span>Dashboard Analytics</span>
+  </header>
+
+  <div class="layout">
+
+    <aside class="sidebar">
+
+      <div class="filter-group">
+        <label class="filter-label">Joueur</label>
+        <input type="text" id="f-joueur" placeholder="Nom..." />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Pays</label>
+        <select id="f-pays">
+          <option value="">Tous</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Tournoi</label>
+        <select id="f-tournoi">
+          <option value="">Tous</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">ELO</label>
+        <div class="range-row">
+          <input type="number" id="f-elo-min" placeholder="Min" />
+          <input type="number" id="f-elo-max" placeholder="Max" />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Période</label>
+        <input type="date" id="f-date-debut" />
+        <input type="date" id="f-date-fin" />
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <button class="btn btn-primary" onclick="applyFilters()">Rechercher</button>
+        <button class="btn btn-secondary" onclick="resetFilters()">Réinitialiser</button>
+      </div>
+
+    </aside>
+
+    <main>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('joueurs')">Joueurs</div>
+        <div class="tab" onclick="switchTab('tournois')">Tournois</div>
+        <div class="tab" onclick="switchTab('ouvertures')">Ouvertures</div>
+      </div>
+
+      <!-- JOUEURS -->
+      <div id="panel-joueurs" class="panel active">
+        <div class="detail-panel" id="detail-joueur"></div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span>Joueurs</span>
+            <span class="table-count" id="count-joueurs">—</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Pays</th>
+                <th>ELO</th>
+                <th>Parties</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-joueurs">
+              <tr>
+                <td colspan="4">
+                  <div class="empty"><span class="icon">♟</span>Recherche pour afficher les joueurs</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TOURNOIS -->
+      <div id="panel-tournois" class="panel">
+        <div class="detail-panel" id="detail-tournoi"></div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span>Tournois</span>
+            <span class="table-count" id="count-tournois">—</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Pays</th>
+                <th>Joueurs</th>
+                <th>ELO moyen</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-tournois">
+              <tr>
+                <td colspan="5">
+                  <div class="empty"><span class="icon">♟</span>Recherche pour afficher les tournois</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OUVERTURES -->
+      <div id="panel-ouvertures" class="panel">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span>Ouvertures</span>
+            <span class="table-count" id="count-ouvertures">—</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ECO</th>
+                <th>Ouverture</th>
+                <th>Parties</th>
+                <th>Victoires</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-ouvertures">
+              <tr>
+                <td colspan="4">
+                  <div class="empty"><span class="icon">♟</span>Sélectionne un joueur ou un pays</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>

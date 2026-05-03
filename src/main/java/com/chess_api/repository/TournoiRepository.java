@@ -12,10 +12,17 @@ import java.util.List;
 @Repository
 public interface TournoiRepository extends JpaRepository<Tournoi, Long> {
 
-    List<Tournoi> findByPaysCode(String codePays);
-
-    List<Tournoi> findByDateBetween(LocalDate debut, LocalDate fin);
-
-    @Query("SELECT t FROM Tournoi t WHERE LOWER(t.nom) LIKE LOWER(CONCAT('%', :nom, '%'))")
-    List<Tournoi> searchByNom(@Param("nom") String nom);
+    @Query("""
+        SELECT t FROM Tournoi t
+        WHERE (:nom   IS NULL OR LOWER(t.nom) LIKE LOWER(CONCAT('%', :nom, '%')))
+        AND   (:pays  IS NULL OR t.pays.code = :pays)
+        AND   (:debut IS NULL OR t.date >= :debut)
+        AND   (:fin   IS NULL OR t.date <= :fin)
+        """)
+    List<Tournoi> search(
+        @Param("nom")   String    nom,
+        @Param("pays")  String    pays,
+        @Param("debut") LocalDate debut,
+        @Param("fin")   LocalDate fin
+    );
 }

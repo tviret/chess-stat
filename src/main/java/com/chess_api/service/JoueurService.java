@@ -21,22 +21,14 @@ public class JoueurService {
     private final ParticipationRepository participationRepository;
     private final PaysService paysService;
 
-    public List<JoueurDto> findAll() {
-        return joueurRepository.findAll().stream()
-                .map(this::toDto)
-                .toList();
-    }
-
-    public List<JoueurDto> findByPays(String codePays) {
-        return joueurRepository.findByPaysCode(codePays).stream()
-                .map(this::toDto)
-                .toList();
-    }
-
-    public List<JoueurDto> search(String nom) {
-        return joueurRepository.searchByNom(nom).stream()
-                .map(this::toDto)
-                .toList();
+    public List<JoueurDto> search(String nom, String pays, Long tournoi, Integer eloMin, Integer eloMax) {
+        return joueurRepository.search(
+                nom   != null && !nom.isBlank()   ? nom   : null,
+                pays  != null && !pays.isBlank()  ? pays  : null,
+                tournoi,
+                eloMin,
+                eloMax
+        ).stream().map(this::toDto).toList();
     }
 
     public JoueurStatsDto getStats(String nomComplet) {
@@ -45,17 +37,16 @@ public class JoueurService {
 
         List<Partie> parties = partieRepository.findByJoueur(nomComplet);
 
-        long nbParties = parties.size();
+        long nbParties   = parties.size();
         long nbVictoires = parties.stream().filter(p ->
-                (p.getJoueurBlancs().getNomComplet().equals(nomComplet) && p.getResultat() == 1) ||
-                (p.getJoueurNoirs().getNomComplet().equals(nomComplet) && p.getResultat() == -1)
+                (p.getJoueurBlancs().getNomComplet().equals(nomComplet) && p.getResultat() ==  1) ||
+                (p.getJoueurNoirs() .getNomComplet().equals(nomComplet) && p.getResultat() == -1)
         ).count();
-        long nbNulles = parties.stream().filter(p -> p.getResultat() == 0).count();
+        long nbNulles   = parties.stream().filter(p -> p.getResultat() == 0).count();
         long nbDefaites = nbParties - nbVictoires - nbNulles;
 
         double tauxVictoire = nbParties > 0 ? (double) nbVictoires / nbParties * 100 : 0;
 
-        // ELO moyen via les participations
         int eloMoyen = (int) participationRepository.findByJoueurNomComplet(nomComplet)
                 .stream()
                 .filter(p -> p.getElo() != null)

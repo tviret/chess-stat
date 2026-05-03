@@ -5,8 +5,16 @@ target/
 .idea/
 *.iml
 
+# Node
+node_modules/
+frontend/node_modules/
+
 # Variables d'environnement
 .env
 
 # Dumps SQL (données sensibles)
 init/
+
+# IDE / Outils locaux
+.vscode/
+.claude/

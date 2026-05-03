@@ -21,28 +21,13 @@ public class TournoiService {
     private final PartieRepository partieRepository;
     private final PaysService paysService;
 
-    public List<TournoiDto> findAll() {
-        return tournoiRepository.findAll().stream()
-                .map(this::toDto)
-                .toList();
-    }
-
-    public List<TournoiDto> findByPays(String codePays) {
-        return tournoiRepository.findByPaysCode(codePays).stream()
-                .map(this::toDto)
-                .toList();
-    }
-
-    public List<TournoiDto> findByDateRange(LocalDate debut, LocalDate fin) {
-        return tournoiRepository.findByDateBetween(debut, fin).stream()
-                .map(this::toDto)
-                .toList();
-    }
-
-    public List<TournoiDto> search(String nom) {
-        return tournoiRepository.searchByNom(nom).stream()
-                .map(this::toDto)
-                .toList();
+    public List<TournoiDto> search(String nom, String pays, LocalDate debut, LocalDate fin) {
+        return tournoiRepository.search(
+                nom  != null && !nom.isBlank()  ? nom  : null,
+                pays != null && !pays.isBlank() ? pays : null,
+                debut,
+                fin
+        ).stream().map(this::toDto).toList();
     }
 
     public TournoiStatsDto getStats(Long idTournoi) {
