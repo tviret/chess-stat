@@ -9,7 +9,7 @@ services:
       MYSQL_USER: chess_user
       MYSQL_PASSWORD: chess_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - chess_data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d

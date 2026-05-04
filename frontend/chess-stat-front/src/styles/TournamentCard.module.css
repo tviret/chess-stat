@@ -1,0 +1,51 @@
+/* ═══════════════════════════════════════
+   TournamentCard.module.css
+═══════════════════════════════════════ */
+
+.card {
+  background: var(--c0);
+  border: 1.5px solid var(--c3);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card);
+  border-color: var(--c6);
+  transform: translateY(-2px);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.name {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c11);
+  margin-bottom: 4px;
+}
+
+.catBadge {
+  background: var(--c11);
+  color: white;
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.meta {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--c7);
+  flex-wrap: wrap;
+}

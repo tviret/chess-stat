@@ -3,22 +3,27 @@ spring:
     name: chess-api
 
   datasource:
-    url: jdbc:mysql://localhost:3306/chess_api?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3307/chess_api?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: chess_user
     password: chess_pass
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
+    defer-datasource-initialization: true
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
+  sql:
+    init:
+      mode: always
+
 server:
-  port: 8080
+  port: 3000
 
 logging:
   level:

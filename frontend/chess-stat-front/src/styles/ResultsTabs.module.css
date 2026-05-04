@@ -1,0 +1,85 @@
+/* ═══════════════════════════════════════
+   ResultsTabs.module.css
+═══════════════════════════════════════ */
+
+.tabsBar {
+  padding: 0 var(--space-xxl);
+  background: var(--c0);
+  border-bottom: 2px solid var(--c3);
+  display: flex;
+  align-items: flex-end;
+}
+
+.tabBtn {
+  padding: 14px 22px;
+  border: none;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c7);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s;
+}
+
+.tabBtn.active {
+  color: var(--c11);
+  font-weight: 600;
+  border-bottom-color: var(--c8);
+}
+
+.count {
+  display: inline-block;
+  background: var(--c3);
+  color: var(--c9);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.sortBar {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-bottom: var(--space-sm);
+}
+
+.sortLabel {
+  font-size: 12px;
+  color: var(--c7);
+}
+
+.sortBtn {
+  border: 1px solid var(--c4);
+  border-radius: var(--radius-sm);
+  background: white;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-family: var(--sans);
+  cursor: pointer;
+  color: var(--c11);
+  font-weight: 500;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.sortBtn.active {
+  background: var(--c3);
+  border-color: var(--c8);
+  color: var(--c9);
+}
+
+/* Grid */
+.results {
+  padding: 28px var(--space-xxl) var(--space-xxl);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}

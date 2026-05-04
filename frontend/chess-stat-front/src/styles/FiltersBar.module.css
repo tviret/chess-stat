@@ -1,0 +1,66 @@
+/* ═══════════════════════════════════════
+   FiltersBar.module.css
+═══════════════════════════════════════ */
+
+.bar {
+  background: var(--c2);
+  border-bottom: 1px solid var(--c4);
+  padding: 12px var(--space-xxl);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--c7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-right: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.pill {
+  border: 1.5px solid var(--c5);
+  border-radius: var(--radius-pill);
+  background: white;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--sans);
+  color: var(--c11);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.pill:hover {
+  border-color: var(--c8);
+  background: var(--c2);
+}
+
+.pill.active {
+  border-color: var(--c8);
+  background: var(--c3);
+  color: var(--c9);
+}
+
+.reset {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--c7);
+  font-size: 13px;
+  font-family: var(--sans);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.reset:hover {
+  color: var(--c8);
+}

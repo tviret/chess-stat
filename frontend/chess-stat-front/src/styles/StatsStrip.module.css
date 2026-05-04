@@ -1,0 +1,42 @@
+/* ═══════════════════════════════════════
+   StatsStrip.module.css
+═══════════════════════════════════════ */
+
+.strip {
+  background: var(--c0);
+  border-bottom: 1px solid var(--c3);
+  display: flex;
+  justify-content: center;
+}
+
+.inner {
+  display: flex;
+  max-width: 800px;
+  width: 100%;
+}
+
+.item {
+  flex: 1;
+  padding: 18px var(--space-lg);
+  text-align: center;
+  border-right: 1px solid var(--c3);
+}
+
+.item:last-child {
+  border-right: none;
+}
+
+.value {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--c11);
+}
+
+.label {
+  font-size: 11px;
+  color: var(--c7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
