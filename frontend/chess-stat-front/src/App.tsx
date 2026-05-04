@@ -1,65 +1,53 @@
 // ─────────────────────────────────────────
 //  Chess Stats — App.tsx
-//  Root component / client-side router
 // ─────────────────────────────────────────
 
 import React, { useState, useCallback } from 'react';
-import type { PageType, ActiveFilters, TabType } from './types';
-import type { Player } from './types';
-import { CARLSEN } from './data';
+import type { PageType, FilterState } from './types';
 import { MainLayout } from './layouts/MainLayout';
 import { HomePage } from './pages/HomePage';
 import { PlayerPage } from './pages/PlayerPage';
+import { TournamentPage } from './pages/TournamentPage';
+
+const EMPTY_FILTERS: FilterState = {
+  joueur: '', pays: '', tournoi: '', eloMin: '', eloMax: '', dateDebut: '', dateFin: '',
+};
 
 const App: React.FC = () => {
-  // ── Routing state ──────────────────────
-  const [page, setPage]               = useState<PageType>('home');
-  const [selectedPlayer, setSelected] = useState(CARLSEN); // default to Carlsen for demo
+  const [page, setPage]             = useState<PageType>('home');
+  const [playerNom, setPlayerNom]   = useState('');
+  const [tournoiSel, setTournoiSel] = useState<{ id: number; nom: string } | null>(null);
+  const [filters, setFilters]       = useState<FilterState>(EMPTY_FILTERS);
 
-  // ── Filter state ───────────────────────
-  const [activeFilters, setFilters]   = useState<ActiveFilters>({});
+  const goHome = useCallback(() => setPage('home'), []);
 
-  // ── Handlers ──────────────────────────
-  const handleNavigate = useCallback((p: PageType) => {
-    setPage(p === 'home' ? 'home' : 'home'); // extend for multi-page routing
-  }, []);
-
-  const handlePlayerClick = useCallback((_player: Player) => {
-    // In a real app: fetch player detail by id
-    // Here we use the static CARLSEN mock for any player click
-    setSelected(CARLSEN);
+  const handlePlayerClick = useCallback((nom: string) => {
+    setPlayerNom(nom);
     setPage('player');
   }, []);
 
-  const handleBack = useCallback(() => {
-    setPage('home');
+  const handleTournoiClick = useCallback((id: number, nom: string) => {
+    setTournoiSel({ id, nom });
+    setPage('tournament');
   }, []);
 
-  const handleFilterToggle = useCallback((key: string) => {
-    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+  const handleSearch = useCallback((query: string) => {
+    setFilters(prev => ({ ...prev, joueur: query }));
   }, []);
 
-  const handleFilterReset = useCallback(() => {
-    setFilters({});
-  }, []);
-
-  const handleQuickFilter = useCallback((key: string, tab: TabType) => {
-    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
-    // If tab switch needed, HomePage handles it internally via ResultsTabs
-  }, []);
-
-  // ── Render ────────────────────────────
   return (
-    <MainLayout currentPage={page} onNavigate={handleNavigate}>
+    <MainLayout currentPage={page} onNavigate={(p) => { if (p === 'home') goHome(); }}>
       {page === 'player' ? (
-        <PlayerPage player={selectedPlayer} onBack={handleBack} />
+        <PlayerPage nom={playerNom} onBack={goHome} />
+      ) : page === 'tournament' && tournoiSel ? (
+        <TournamentPage id={tournoiSel.id} nom={tournoiSel.nom} onBack={goHome} />
       ) : (
         <HomePage
-          activeFilters={activeFilters}
-          onFilterToggle={handleFilterToggle}
-          onFilterReset={handleFilterReset}
-          onQuickFilter={handleQuickFilter}
+          filters={filters}
+          onFiltersChange={setFilters}
+          onSearch={handleSearch}
           onPlayerClick={handlePlayerClick}
+          onTournoiClick={handleTournoiClick}
         />
       )}
     </MainLayout>

@@ -1,6 +1,5 @@
 // ─────────────────────────────────────────
 //  Chess Stats — MainLayout
-//  Wraps every page with Navbar
 // ─────────────────────────────────────────
 
 import React from 'react';
@@ -13,15 +12,9 @@ interface MainLayoutProps {
   onNavigate: (page: PageType) => void;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({
-  children,
-  currentPage,
-  onNavigate,
-}) => {
-  return (
-    <div style={{ minHeight: '100vh', background: 'var(--c1)' }}>
-      <Navbar currentPage={currentPage} onNavigate={onNavigate} />
-      <main>{children}</main>
-    </div>
-  );
-};
+export const MainLayout: React.FC<MainLayoutProps> = ({ children, currentPage, onNavigate }) => (
+  <div style={{ minHeight: '100vh', background: 'var(--c1)' }}>
+    <Navbar currentPage={currentPage} onNavigate={onNavigate} />
+    <main>{children}</main>
+  </div>
+);

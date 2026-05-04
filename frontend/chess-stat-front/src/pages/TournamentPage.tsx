@@ -1,19 +1,18 @@
 // ─────────────────────────────────────────
-//  Chess Stats — PlayerPage (données API)
+//  Chess Stats — TournamentPage (données API)
 // ─────────────────────────────────────────
 
 import React, { useEffect, useState } from 'react';
-import type { ApiJoueurStats, ApiOuverture } from '../types';
-import { fetchJoueurStats, fetchJoueurOuvertures } from '../api';
+import type { ApiTournoiStats } from '../types';
+import { fetchTournoiStats } from '../api';
 
-interface PlayerPageProps {
+interface TournamentPageProps {
+  id: number;
   nom: string;
   onBack: () => void;
 }
 
-const StatCard: React.FC<{ label: string; value: string | number; accent?: boolean }> = ({
-  label, value, accent,
-}) => (
+const StatCard: React.FC<{ label: string; value: string | number }> = ({ label, value }) => (
   <div style={{
     background: 'var(--c0)', border: '1px solid var(--c3)',
     borderRadius: 10, padding: '20px 22px',
@@ -25,36 +24,30 @@ const StatCard: React.FC<{ label: string; value: string | number; accent?: boole
       {label}
     </div>
     <div style={{
-      fontFamily: 'var(--serif)', fontSize: 32, fontWeight: 700,
-      color: accent ? 'var(--c8)' : 'var(--c11)',
+      fontFamily: 'var(--serif)', fontSize: 32, fontWeight: 700, color: 'var(--c11)',
     }}>
       {value}
     </div>
   </div>
 );
 
-export const PlayerPage: React.FC<PlayerPageProps> = ({ nom, onBack }) => {
-  const [stats, setStats]           = useState<ApiJoueurStats | null>(null);
-  const [ouvertures, setOuvertures] = useState<ApiOuverture[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState('');
+export const TournamentPage: React.FC<TournamentPageProps> = ({ id, nom, onBack }) => {
+  const [stats, setStats]   = useState<ApiTournoiStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]   = useState('');
 
   useEffect(() => {
     setLoading(true);
     setError('');
-    Promise.all([
-      fetchJoueurStats(nom),
-      fetchJoueurOuvertures(nom).catch(() => [] as ApiOuverture[]),
-    ])
-      .then(([s, ouv]) => {
-        setStats(s);
-        setOuvertures(ouv);
-      })
+    fetchTournoiStats(id)
+      .then(s => setStats(s))
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-  }, [nom]);
+  }, [id]);
 
-  const initial = nom.charAt(0).toUpperCase();
+  const totalParties = stats
+    ? (stats.nbVictoiresBlancs || 0) + (stats.nbVictoiresNoirs || 0) + (stats.nbNulles || 0)
+    : 0;
 
   return (
     <div style={{ background: 'var(--c1)', minHeight: '100vh' }}>
@@ -65,10 +58,7 @@ export const PlayerPage: React.FC<PlayerPageProps> = ({ nom, onBack }) => {
         gap: 8, fontSize: 13, color: 'var(--c7)',
         background: 'var(--c0)', borderBottom: '1px solid var(--c3)',
       }}>
-        <span
-          onClick={onBack}
-          style={{ color: 'var(--c8)', cursor: 'pointer' }}
-        >
+        <span onClick={onBack} style={{ color: 'var(--c8)', cursor: 'pointer' }}>
           ← Retour aux résultats
         </span>
         <span>/</span>
@@ -91,7 +81,6 @@ export const PlayerPage: React.FC<PlayerPageProps> = ({ nom, onBack }) => {
           <div style={{
             background: 'linear-gradient(160deg, var(--c11) 0%, #2a4490 60%, var(--c10) 100%)',
             padding: '40px 40px 36px',
-            display: 'flex', alignItems: 'center', gap: 32,
             position: 'relative', overflow: 'hidden',
           }}>
             <div aria-hidden style={{
@@ -99,59 +88,37 @@ export const PlayerPage: React.FC<PlayerPageProps> = ({ nom, onBack }) => {
               fontSize: 200, opacity: .04, color: 'white',
               lineHeight: 1, pointerEvents: 'none',
             }}>♟</div>
-
-            {/* Avatar */}
-            <div style={{
-              width: 100, height: 100, borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--c5), var(--c7))',
-              border: '4px solid rgba(255,255,255,.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'var(--serif)', fontSize: 42, color: 'var(--c11)',
-              fontWeight: 700, flexShrink: 0,
+            <h1 style={{
+              fontFamily: 'var(--serif)', fontSize: 36, fontWeight: 700,
+              color: 'white', marginBottom: 8,
             }}>
-              {initial}
-            </div>
-
-            <div>
-              <h1 style={{
-                fontFamily: 'var(--serif)', fontSize: 36, fontWeight: 700,
-                color: 'white', marginBottom: 8,
-              }}>
-                {stats.nomComplet}
-              </h1>
-              {stats.eloMoyen != null && (
-                <div style={{ color: 'var(--c5)', fontSize: 15 }}>
-                  ELO moyen : <strong style={{ color: 'white' }}>{stats.eloMoyen}</strong>
-                </div>
-              )}
-            </div>
+              {stats.nom}
+            </h1>
           </div>
 
-          {/* Stats grid */}
+          {/* Content */}
           <div style={{ padding: '28px 40px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+
+            {/* Stats grid */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
               gap: 14,
             }}>
-              <StatCard label="Parties"        value={stats.nbParties}   />
-              <StatCard label="Victoires"       value={stats.nbVictoires} accent />
-              <StatCard label="Nulles"          value={stats.nbNulles}    />
-              <StatCard label="Défaites"        value={stats.nbDefaites}  />
-              {stats.tauxVictoire != null && (
-                <StatCard
-                  label="Taux de victoire"
-                  value={stats.tauxVictoire.toFixed(1) + ' %'}
-                  accent
-                />
+              <StatCard label="Total parties"     value={totalParties}                  />
+              <StatCard label="Victoires blancs"  value={stats.nbVictoiresBlancs}       />
+              <StatCard label="Victoires noirs"   value={stats.nbVictoiresNoirs}        />
+              <StatCard label="Nulles"             value={stats.nbNulles}               />
+              {stats.nbrJoueurs != null && (
+                <StatCard label="Joueurs"          value={stats.nbrJoueurs}             />
               )}
-              {stats.eloMoyen != null && (
-                <StatCard label="ELO moyen" value={stats.eloMoyen} />
+              {stats.classementMoyen != null && (
+                <StatCard label="ELO moyen"        value={stats.classementMoyen}        />
               )}
             </div>
 
-            {/* Ouvertures */}
-            {ouvertures.length > 0 && (
+            {/* Top ouvertures */}
+            {stats.topOuvertures && stats.topOuvertures.length > 0 && (
               <div style={{
                 background: 'var(--c0)', border: '1px solid var(--c3)',
                 borderRadius: 10, overflow: 'hidden',
@@ -160,7 +127,7 @@ export const PlayerPage: React.FC<PlayerPageProps> = ({ nom, onBack }) => {
                   padding: '16px 22px', borderBottom: '1px solid var(--c3)',
                   fontFamily: 'var(--serif)', fontSize: 17, fontWeight: 600, color: 'var(--c11)',
                 }}>
-                  Ouvertures jouées
+                  Ouvertures les plus jouées
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                   <thead>
@@ -176,7 +143,7 @@ export const PlayerPage: React.FC<PlayerPageProps> = ({ nom, onBack }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {ouvertures.map((o, i) => (
+                    {stats.topOuvertures.map((o, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid var(--c2)' }}>
                         <td style={{ padding: '11px 16px' }}>
                           <span style={{

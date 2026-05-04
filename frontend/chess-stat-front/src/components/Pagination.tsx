@@ -10,64 +10,97 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
+const BTN_BASE: React.CSSProperties = {
+  width: 36, height: 36,
+  borderRadius: 6,
+  fontFamily: 'var(--sans)', fontSize: 14,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  cursor: 'pointer',
+};
+
 export const Pagination: React.FC<PaginationProps> = ({
-  currentPage,
-  totalPages,
-  onPageChange,
+  currentPage, totalPages, onPageChange,
 }) => {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const shown = Math.min(3, totalPages);
+  const hasMore = totalPages > 3;
+
+  function pageBtn(p: number) {
+    const active = p === currentPage;
+    return (
+      <button
+        key={p}
+        onClick={() => onPageChange(p)}
+        style={{
+          ...BTN_BASE,
+          border: active ? '1.5px solid var(--c8)' : '1.5px solid var(--c4)',
+          background: active ? 'var(--c8)' : 'white',
+          color: active ? 'white' : 'var(--c11)',
+          fontWeight: active ? 700 : 400,
+        }}
+      >
+        {p}
+      </button>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 32 }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 32 }}>
       {/* Prev */}
       <button
         onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         style={{
-          width: 36, height: 36,
-          border: '1.5px solid var(--c4)', borderRadius: 6,
-          background: 'white', fontFamily: 'var(--sans)', fontSize: 14,
-          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          ...BTN_BASE,
+          border: '1.5px solid var(--c4)',
+          background: 'white',
           color: currentPage === 1 ? 'var(--c5)' : 'var(--c11)',
           opacity: currentPage === 1 ? 0.5 : 1,
+          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
         }}
       >
         ←
       </button>
 
-      {/* Page numbers */}
-      {pages.map((page) => (
-        <button
-          key={page}
-          onClick={() => onPageChange(page)}
+      {/* Pages 1–3 */}
+      {Array.from({ length: shown }, (_, i) => pageBtn(i + 1))}
+
+      {/* Dropdown for pages 4+ */}
+      {hasMore && (
+        <select
+          value={currentPage > 3 ? currentPage : ''}
+          onChange={e => onPageChange(Number(e.target.value))}
           style={{
-            width: 36, height: 36,
-            border: page === currentPage ? '1.5px solid var(--c8)' : '1.5px solid var(--c4)',
+            height: 36,
+            border: currentPage > 3 ? '1.5px solid var(--c8)' : '1.5px solid var(--c4)',
             borderRadius: 6,
-            background: page === currentPage ? 'var(--c8)' : 'white',
-            fontFamily: 'var(--sans)', fontSize: 14, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: page === currentPage ? 'white' : 'var(--c11)',
-            fontWeight: page === currentPage ? 700 : 400,
+            background: currentPage > 3 ? 'var(--c8)' : 'white',
+            color: currentPage > 3 ? 'white' : 'var(--c7)',
+            fontFamily: 'var(--sans)', fontSize: 13,
+            cursor: 'pointer',
+            padding: '0 6px',
+            minWidth: 80,
           }}
         >
-          {page}
-        </button>
-      ))}
+          {currentPage <= 3 && (
+            <option value="" disabled>… / {totalPages}</option>
+          )}
+          {Array.from({ length: totalPages - 3 }, (_, i) => i + 4).map(p => (
+            <option key={p} value={p}>Page {p} / {totalPages}</option>
+          ))}
+        </select>
+      )}
 
       {/* Next */}
       <button
         onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         style={{
-          width: 36, height: 36,
-          border: '1.5px solid var(--c4)', borderRadius: 6,
-          background: 'white', fontFamily: 'var(--sans)', fontSize: 14,
-          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          ...BTN_BASE,
+          border: '1.5px solid var(--c4)',
+          background: 'white',
           color: currentPage === totalPages ? 'var(--c5)' : 'var(--c11)',
           opacity: currentPage === totalPages ? 0.5 : 1,
+          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
         }}
       >
         →

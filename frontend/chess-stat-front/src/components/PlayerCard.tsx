@@ -1,28 +1,29 @@
 // ─────────────────────────────────────────
-//  Chess Stats — PlayerCard component
+//  Chess Stats — PlayerCard (API data)
 // ─────────────────────────────────────────
 
 import React, { useState } from 'react';
-import type { Player } from '../types';
+import type { ApiJoueur } from '../types';
 
 interface PlayerCardProps {
-  player: Player;
-  onClick: (player: Player) => void;
+  joueur: ApiJoueur;
+  onClick: (nom: string) => void;
 }
 
-export const PlayerCard: React.FC<PlayerCardProps> = ({ player, onClick }) => {
+export const PlayerCard: React.FC<PlayerCardProps> = ({ joueur, onClick }) => {
   const [hovered, setHovered] = useState(false);
+  const initial = joueur.nomComplet.charAt(0).toUpperCase();
 
   return (
     <div
-      onClick={() => onClick(player)}
+      onClick={() => onClick(joueur.nomComplet)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         background: 'var(--c0)',
         border: `1.5px solid ${hovered ? 'var(--c6)' : 'var(--c3)'}`,
         borderRadius: 12,
-        padding: '18px 20px',
+        padding: '16px 18px',
         display: 'flex',
         alignItems: 'center',
         gap: 14,
@@ -34,14 +35,14 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, onClick }) => {
     >
       {/* Avatar */}
       <div style={{
-        width: 48, height: 48, borderRadius: '50%',
+        width: 44, height: 44, borderRadius: '50%',
         background: 'linear-gradient(135deg, var(--c4), var(--c6))',
         border: '2px solid var(--c5)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'var(--serif)', fontSize: 20, color: 'var(--c11)',
+        fontFamily: 'var(--serif)', fontSize: 18, color: 'var(--c11)',
         fontWeight: 700, flexShrink: 0,
       }}>
-        {player.nom[0]}
+        {initial}
       </div>
 
       {/* Info */}
@@ -50,29 +51,24 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({ player, onClick }) => {
           fontSize: 15, fontWeight: 600, color: 'var(--c11)', marginBottom: 3,
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
-          {player.nom}, {player.prenom}
+          {joueur.nomComplet}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--c7)', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span>{player.flag} {player.pays}</span>
-          <span style={{ fontSize: 11, color: 'var(--c6)' }}>· #{player.rank}</span>
-        </div>
+        {joueur.pays && (
+          <span style={{
+            display: 'inline-block',
+            background: 'rgba(61,99,221,.08)',
+            color: 'var(--c8)',
+            borderRadius: 4,
+            padding: '2px 8px',
+            fontSize: 11,
+            fontWeight: 600,
+          }}>
+            {joueur.pays.code.toUpperCase()}
+          </span>
+        )}
       </div>
 
-      {/* Elo */}
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <span style={{
-          fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 700,
-          color: 'var(--c8)', display: 'block', lineHeight: 1,
-        }}>
-          {player.elo}
-        </span>
-        <span style={{
-          fontSize: 10, color: 'var(--c7)', textTransform: 'uppercase',
-          letterSpacing: '.07em', marginTop: 2, display: 'block',
-        }}>
-          Élo
-        </span>
-      </div>
+      <span style={{ fontSize: 18, color: 'var(--c5)', flexShrink: 0 }}>→</span>
     </div>
   );
 };

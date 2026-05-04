@@ -1,58 +1,58 @@
 // ─────────────────────────────────────────
-//  Chess Stats — TournamentCard component
+//  Chess Stats — TournamentCard (API data)
 // ─────────────────────────────────────────
 
 import React, { useState } from 'react';
-import type { Tournament } from '../types';
+import type { ApiTournoi } from '../types';
 
 interface TournamentCardProps {
-  tournament: Tournament;
-  onClick?: (tournament: Tournament) => void;
+  tournoi: ApiTournoi;
+  onClick: (id: number, nom: string) => void;
 }
 
-export const TournamentCard: React.FC<TournamentCardProps> = ({ tournament, onClick }) => {
+export const TournamentCard: React.FC<TournamentCardProps> = ({ tournoi, onClick }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      onClick={() => onClick?.(tournament)}
+      onClick={() => onClick(tournoi.id, tournoi.nom)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         background: 'var(--c0)',
         border: `1.5px solid ${hovered ? 'var(--c6)' : 'var(--c3)'}`,
         borderRadius: 12,
-        padding: '20px 22px',
+        padding: '18px 20px',
         cursor: 'pointer',
         transform: hovered ? 'translateY(-2px)' : 'none',
         boxShadow: hovered ? '0 6px 24px rgba(61,99,221,.12)' : 'none',
         transition: 'box-shadow .2s, border-color .2s, transform .15s',
       }}
     >
-      {/* Top row: name + category badge */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between',
-        alignItems: 'flex-start', marginBottom: 10,
-      }}>
+      {/* Name + country */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div style={{
-          fontFamily: 'var(--serif)', fontSize: 16, fontWeight: 600,
-          color: 'var(--c11)', marginBottom: 4,
+          fontFamily: 'var(--serif)', fontSize: 15, fontWeight: 600,
+          color: 'var(--c11)', flex: 1, marginRight: 10,
         }}>
-          {tournament.nom}
+          {tournoi.nom}
         </div>
-        <span style={{
-          background: 'var(--c11)', color: 'white', borderRadius: 4,
-          padding: '2px 8px', fontSize: 11, fontWeight: 600, flexShrink: 0,
-        }}>
-          {tournament.cat}
-        </span>
+        {tournoi.pays && (
+          <span style={{
+            background: 'rgba(61,99,221,.08)', color: 'var(--c8)',
+            borderRadius: 4, padding: '2px 8px',
+            fontSize: 11, fontWeight: 600, flexShrink: 0,
+          }}>
+            {tournoi.pays.code.toUpperCase()}
+          </span>
+        )}
       </div>
 
       {/* Meta */}
       <div style={{ display: 'flex', gap: 14, fontSize: 12, color: 'var(--c7)', flexWrap: 'wrap' }}>
-        <span>📍 {tournament.lieu}</span>
-        <span>📅 {tournament.date}</span>
-        <span>👥 {tournament.nb} joueurs</span>
+        {tournoi.date && <span>📅 {tournoi.date}</span>}
+        {tournoi.nbrJoueurs != null && <span>👥 {tournoi.nbrJoueurs} joueurs</span>}
+        {tournoi.classementMoyen != null && <span>⭐ ELO moy. {tournoi.classementMoyen}</span>}
       </div>
     </div>
   );

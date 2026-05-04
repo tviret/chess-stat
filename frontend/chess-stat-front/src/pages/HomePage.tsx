@@ -2,63 +2,84 @@
 //  Chess Stats — HomePage
 // ─────────────────────────────────────────
 
-import React, { useMemo } from 'react';
-import type { Player, ActiveFilters, TabType } from '../types';
-import { PLAYERS, TOURNAMENTS } from '../data';
+import React, { useEffect, useState, useCallback } from 'react';
+import type { FilterState, ApiPays, ApiTournoi } from '../types';
+import { fetchPays, fetchTournois } from '../api';
 import { Hero } from '../components/Hero';
 import { StatsStrip } from '../components/StatsStrip';
-import { FiltersBar } from '../components/FiltersBar';
+import { Sidebar } from '../components/Sidebar';
 import { ResultsTabs } from '../components/ResultsTabs';
 
 interface HomePageProps {
-  activeFilters: ActiveFilters;
-  onFilterToggle: (key: string) => void;
-  onFilterReset: () => void;
-  onQuickFilter: (key: string, tab: TabType) => void;
-  onPlayerClick: (player: Player) => void;
+  filters: FilterState;
+  onFiltersChange: (f: FilterState) => void;
+  onSearch: (query: string) => void;
+  onPlayerClick: (nom: string) => void;
+  onTournoiClick: (id: number, nom: string) => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
-  activeFilters,
-  onFilterToggle,
-  onFilterReset,
-  onQuickFilter,
-  onPlayerClick,
+  filters, onFiltersChange, onSearch, onPlayerClick, onTournoiClick,
 }) => {
-  const filteredPlayers = useMemo(() => {
-    let list = [...PLAYERS];
-    if (activeFilters.france)  list = list.filter((p) => p.pays === 'France');
-    if (activeFilters.norvege) list = list.filter((p) => p.pays === 'Norvège');
-    if (activeFilters.elo2700) list = list.filter((p) => p.elo > 2700);
-    if (activeFilters.top10)   list = list.filter((p) => p.rank <= 10);
-    return list;
-  }, [activeFilters]);
+  const [paysList, setPaysList]       = useState<ApiPays[]>([]);
+  const [tournoiList, setTournoiList] = useState<ApiTournoi[]>([]);
+  const [applied, setApplied]         = useState<FilterState | null>(null);
 
-  const filteredTournaments = useMemo(() => {
-    let list = [...TOURNAMENTS];
-    if (activeFilters.tournois2026) list = list.filter((t) => t.date.includes('2026'));
-    return list;
-  }, [activeFilters]);
+  // Populate sidebar selects on mount
+  useEffect(() => {
+    fetchPays()
+      .then(p => setPaysList(p.sort((a, b) => a.nom.localeCompare(b.nom))))
+      .catch(console.warn);
+    fetchTournois()
+      .then(t => setTournoiList(t.sort((a, b) => a.nom.localeCompare(b.nom))))
+      .catch(console.warn);
+  }, []);
 
-  function handleSearch(query: string, type: TabType) {
-    // In a real app: dispatch a search action / update URL params
-    console.log('Search:', query, type);
+  const handleApply = useCallback((override?: FilterState) => {
+    const toApply = override ?? { ...filters };
+    if (override) onFiltersChange(override);
+    setApplied(toApply);
+  }, [filters, onFiltersChange]);
+
+  const handleReset = useCallback(() => {
+    const empty: FilterState = {
+      joueur: '', pays: '', tournoi: '', eloMin: '', eloMax: '', dateDebut: '', dateFin: '',
+    };
+    onFiltersChange(empty);
+    setApplied(null);
+  }, [onFiltersChange]);
+
+  function handleHeroSearch(query: string) {
+    onSearch(query);
+    const next = { ...filters, joueur: query };
+    onFiltersChange(next);
+    setApplied(next);
   }
 
   return (
     <>
-      <Hero onSearch={handleSearch} onQuickFilter={onQuickFilter} />
+      <Hero onSearch={handleHeroSearch} />
       <StatsStrip />
-      <FiltersBar
-        activeFilters={activeFilters}
-        onToggle={onFilterToggle}
-        onReset={onFilterReset}
-      />
-      <ResultsTabs
-        players={filteredPlayers}
-        tournaments={filteredTournaments}
-        onPlayerClick={onPlayerClick}
-      />
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '280px 1fr',
+        minHeight: 'calc(100vh - 240px)',
+        alignItems: 'start',
+      }}>
+        <Sidebar
+          filters={filters}
+          paysList={paysList}
+          tournoiList={tournoiList}
+          onChange={onFiltersChange}
+          onApply={handleApply}
+          onReset={handleReset}
+        />
+        <ResultsTabs
+          filters={applied}
+          onPlayerClick={onPlayerClick}
+          onTournoiClick={onTournoiClick}
+        />
+      </div>
     </>
   );
 };
