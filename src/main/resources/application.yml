@@ -3,7 +3,7 @@ spring:
     name: chess-api
 
   datasource:
-    url: jdbc:mysql://localhost:3306/chess_api?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3307/chess_api?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: chess_user
     password: chess_pass
     driver-class-name: com.mysql.cj.jdbc.Driver
