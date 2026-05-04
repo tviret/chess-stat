@@ -1,0 +1,43 @@
+/* ═══════════════════════════════════════
+   Pagination.module.css
+═══════════════════════════════════════ */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: var(--space-xl);
+}
+
+.btn {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--c4);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-family: var(--sans);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c11);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn:hover:not(.active):not(:disabled) {
+  border-color: var(--c8);
+  background: var(--c2);
+}
+
+.btn.active {
+  background: var(--c8);
+  border-color: var(--c8);
+  color: white;
+  font-weight: 700;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
