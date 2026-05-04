@@ -1,9 +1,8 @@
-# Maven
-target/
+# Compiled class file
+*.class
 
-# IntelliJ
-.idea/
-*.iml
+# Log file
+*.log
 
 # Node
 node_modules/
