@@ -1,8 +1,10 @@
 package com.chess_api.service;
 
 import com.chess_api.dto.OuvertureStatsDto;
+import com.chess_api.dto.ParticipationDto;
 import com.chess_api.dto.TournoiDto;
 import com.chess_api.dto.TournoiStatsDto;
+import com.chess_api.entity.Participation;
 import com.chess_api.entity.Partie;
 import com.chess_api.entity.Tournoi;
 import com.chess_api.repository.PartieRepository;
@@ -27,7 +29,7 @@ public class TournoiService {
                 pays != null && !pays.isBlank() ? pays : null,
                 debut,
                 fin
-        ).stream().map(this::toDto).toList();
+        ).stream().map(TournoiService::toDto).toList();
     }
 
     public TournoiStatsDto getStats(Long idTournoi) {
@@ -66,7 +68,14 @@ public class TournoiService {
                 .build();
     }
 
-    public TournoiDto toDto(Tournoi tournoi) {
+    public List<ParticipationDto> getParticipations(Long idTournoi){
+        List<Participation> participations = tournoiRepository.getParticipationsTournoi(idTournoi);
+
+        return participations.stream().map(this::participationToDto).toList();
+
+    }
+
+    public static TournoiDto toDto(Tournoi tournoi) {
         return TournoiDto.builder()
                 .id(tournoi.getId())
                 .nom(tournoi.getNom())
@@ -74,7 +83,17 @@ public class TournoiService {
                 .classementMoyen(tournoi.getClassementMoyen())
                 .nbrJoueurs(tournoi.getNbrJoueurs())
                 .nbrParties(tournoi.getNbrParties())
-                .pays(tournoi.getPays() != null ? paysService.toDto(tournoi.getPays()) : null)
+                .pays(tournoi.getPays() != null ? PaysService.toDto(tournoi.getPays()) : null)
+                .build();
+    }
+
+    public ParticipationDto participationToDto(Participation participation) {
+        return ParticipationDto.builder()
+                .id(participation.getId())
+                .joueur(participation.getJoueur())
+                .tournoi(participation.getTournoi())
+                .elo(participation.getElo())
+                .pointsMarques(participation.getPointsMarques())
                 .build();
     }
 }

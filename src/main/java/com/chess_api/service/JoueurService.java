@@ -2,8 +2,12 @@ package com.chess_api.service;
 
 import com.chess_api.dto.JoueurDto;
 import com.chess_api.dto.JoueurStatsDto;
+import com.chess_api.dto.PartieDto;
+import com.chess_api.dto.TournoiDto;
 import com.chess_api.entity.Joueur;
+import com.chess_api.entity.Participation;
 import com.chess_api.entity.Partie;
+import com.chess_api.entity.Tournoi;
 import com.chess_api.repository.JoueurRepository;
 import com.chess_api.repository.ParticipationRepository;
 import com.chess_api.repository.PartieRepository;
@@ -66,11 +70,45 @@ public class JoueurService {
                 .build();
     }
 
+    public List<PartieDto> getParties(String nomComplet){
+        Joueur joueur = joueurRepository.findByNomComplet(nomComplet)
+            .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + nomComplet));
+
+        List<Partie> parties = partieRepository.findByJoueur(nomComplet);
+
+        return parties.stream().map(this::partieToDto).toList();
+    }
+
+    public List<TournoiDto> getTournoisJoueur(String nomComplet){
+        Joueur joueur = joueurRepository.findByNomComplet(nomComplet)
+                .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + nomComplet));
+
+        List<Tournoi> tournois = joueurRepository.getTournoisJoueur(nomComplet);
+
+        return tournois.stream().map(tournoi -> TournoiService.toDto(tournoi)).toList();
+
+
+    }
+
     public JoueurDto toDto(Joueur joueur) {
         return JoueurDto.builder()
                 .id(joueur.getId())
                 .nomComplet(joueur.getNomComplet())
                 .pays(joueur.getPays() != null ? paysService.toDto(joueur.getPays()) : null)
+                .build();
+    }
+
+    public PartieDto partieToDto(Partie partie) {
+        return PartieDto.builder()
+                .id(partie.getId())
+                .joueurBlancs(partie.getJoueurBlancs())
+                .joueurNoirs(partie.getJoueurNoirs())
+                .resultat(partie.getResultat())
+                .ouverture(partie.getOuverture())
+                .tournoi(partie.getTournoi())
+                .datePartie(partie.getDatePartie())
+                .ronde(partie.getRonde())
+                .numeroTable(partie.getNumeroTable())
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.chess_api.repository;
 
+import com.chess_api.entity.Participation;
 import com.chess_api.entity.Tournoi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +26,10 @@ public interface TournoiRepository extends JpaRepository<Tournoi, Long> {
         @Param("debut") LocalDate debut,
         @Param("fin")   LocalDate fin
     );
+
+    @Query("""
+    SELECT p FROM Participation p
+    WHERE p.tournoi.id = :tournoiId
+""")
+    List<Participation> getParticipationsTournoi(@Param("tournoiId") Long tournoiId);
 }

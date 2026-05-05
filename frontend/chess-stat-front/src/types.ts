@@ -49,6 +49,26 @@ export interface ApiOuverture {
   nbVictoires: number | null;
 }
 
+export interface ApiParticipation {
+  id: number;
+  joueur: { nomComplet: string; pays?: { code: string; nom?: string } | null } | null;
+  tournoi: { id: number; nom: string } | null;
+  elo: number | null;
+  pointsMarques: number | null;
+}
+
+export interface ApiPartie {
+  id: number;
+  joueurBlancs: { nomComplet: string; pays?: { code: string; nom?: string } | null } | null;
+  joueurNoirs:  { nomComplet: string; pays?: { code: string; nom?: string } | null } | null;
+  resultat: number | null;
+  ouverture: { codeEco: string; libelle: string } | null;
+  tournoi: { id: number; nom: string } | null;
+  datePartie: string | null;
+  ronde: number | null;
+  numeroTable: number | null;
+}
+
 // UI state types
 export interface FilterState {
   joueur: string;

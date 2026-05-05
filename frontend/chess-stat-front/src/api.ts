@@ -8,6 +8,8 @@ import type {
   ApiTournoi,
   ApiTournoiStats,
   ApiOuverture,
+  ApiPartie,
+  ApiParticipation,
 } from './types';
 
 async function get<T>(path: string): Promise<T> {
@@ -56,8 +58,20 @@ export function fetchJoueurOuvertures(nom: string): Promise<ApiOuverture[]> {
   return get('/api/joueurs/' + encodeURIComponent(nom) + '/ouvertures?detail=true');
 }
 
+export function fetchJoueurParties(nom: string): Promise<ApiPartie[]> {
+  return get('/api/joueurs/' + encodeURIComponent(nom) + '/parties');
+}
+
+export function fetchJoueurTournois(nom: string): Promise<ApiTournoi[]> {
+  return get('/api/joueurs/' + encodeURIComponent(nom) + '/tournois');
+}
+
 export function fetchTournoiStats(id: number): Promise<ApiTournoiStats> {
   return get('/api/tournois/' + id + '/stats');
+}
+
+export function fetchTournoiParticipations(id: number): Promise<ApiParticipation[]> {
+  return get('/api/tournois/' + id + '/participations');
 }
 
 export function fetchOuverturesByPays(pays: string): Promise<ApiOuverture[]> {
