@@ -1,6 +1,8 @@
 package com.chess_api.repository;
 
 import com.chess_api.entity.Joueur;
+import com.chess_api.entity.Participation;
+import com.chess_api.entity.Tournoi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,4 +32,12 @@ public interface JoueurRepository extends JpaRepository<Joueur, Long> {
         @Param("eloMin")  Integer eloMin,
         @Param("eloMax")  Integer eloMax
     );
+
+    @Query("""
+    SELECT t FROM Participation p
+    JOIN p.tournoi t
+    WHERE p.joueur.nomComplet = :nomComplet
+    ORDER BY t.date DESC
+""")
+    List<Tournoi> getTournoisJoueur(@Param("nomComplet") String nomComplet);
 }

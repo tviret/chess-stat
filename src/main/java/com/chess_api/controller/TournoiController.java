@@ -1,5 +1,6 @@
 package com.chess_api.controller;
 
+import com.chess_api.dto.ParticipationDto;
 import com.chess_api.dto.TournoiDto;
 import com.chess_api.dto.TournoiStatsDto;
 import com.chess_api.service.TournoiService;
@@ -38,5 +39,11 @@ public class TournoiController {
     @GetMapping("/{id}/stats")
     public ResponseEntity<TournoiStatsDto> getStats(@PathVariable Long id) {
         return ResponseEntity.ok(tournoiService.getStats(id));
+    }
+
+    // GET /api/tournois/{id}/stats
+    @GetMapping("/{id}/participations")
+    public ResponseEntity<List<ParticipationDto>> getParticipations(@PathVariable Long id) {
+        return ResponseEntity.ok(tournoiService.getParticipations(id));
     }
 }

@@ -1,8 +1,6 @@
 package com.chess_api.controller;
 
-import com.chess_api.dto.JoueurDto;
-import com.chess_api.dto.JoueurStatsDto;
-import com.chess_api.dto.OuvertureStatsDto;
+import com.chess_api.dto.*;
 import com.chess_api.service.JoueurService;
 import com.chess_api.service.StatsService;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +39,18 @@ public class JoueurController {
     @GetMapping("/{nomComplet}/stats")
     public ResponseEntity<JoueurStatsDto> getStats(@PathVariable String nomComplet) {
         return ResponseEntity.ok(joueurService.getStats(nomComplet));
+    }
+
+    // GET /api/joueurs/{nomComplet}/parties
+    @GetMapping("/{nomComplet}/parties")
+    public ResponseEntity<List<PartieDto>> getParties(@PathVariable String nomComplet) {
+        return ResponseEntity.ok(joueurService.getParties(nomComplet));
+    }
+
+    // GET /api/joueurs/{nomComplet}/tournois
+    @GetMapping("/{nomComplet}/tournois")
+    public ResponseEntity<List<TournoiDto>> getTournois(@PathVariable String nomComplet) {
+        return ResponseEntity.ok(joueurService.getTournoisJoueur(nomComplet));
     }
 
     // GET /api/joueurs/{nomComplet}/ouvertures?detail=true

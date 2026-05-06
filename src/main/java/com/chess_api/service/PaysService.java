@@ -16,17 +16,17 @@ public class PaysService {
 
     public List<PaysDto> findAll() {
         return paysRepository.findAll().stream()
-                .map(this::toDto)
+                .map(PaysService::toDto)
                 .toList();
     }
 
     public PaysDto findByCode(String code) {
         return paysRepository.findByCode(code)
-                .map(this::toDto)
+                .map(PaysService::toDto)
                 .orElseThrow(() -> new RuntimeException("Pays introuvable : " + code));
     }
 
-    public PaysDto toDto(Pays pays) {
+    public static PaysDto toDto(Pays pays) {
         return PaysDto.builder()
                 .code(pays.getCode())
                 .nom(pays.getNom())
