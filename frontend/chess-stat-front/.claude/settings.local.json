@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\User\\\\Desktop\\\\2 - MASTER MIAGE\\\\2026\\\\Techno Logicielles\\\\chess-stat\\\\frontend\\\\chess-stat-front\\\\src\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(npx tsc *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\User\\\\Desktop\\\\2 - MASTER MIAGE\\\\2026\\\\Techno Logicielles\\\\chess-stat\\\\frontend\\\\chess-stat-front\" -Force)",
+      "Bash(Select-Object Name, FullName)"
+    ]
+  }
+}
