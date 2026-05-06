@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import type { FilterState, TabType, ApiJoueur, ApiTournoi, ApiOuverture } from '../types';
 import {
   fetchJoueurs, fetchTournois,
-  fetchJoueurOuvertures, fetchTournoiStats, fetchOuverturesByPays,
+  fetchJoueurOuvertures, fetchTournoiStats, fetchOuverturesByPays, fetchOuvertures,
 } from '../api';
 import { PlayerCard } from './PlayerCard';
 import { TournamentCard } from './TournamentCard';
@@ -53,11 +53,13 @@ export const ResultsTabs: React.FC<ResultsTabsProps> = ({
   const [tournoiError, setTournoiError]     = useState('');
   const [ouvertureError, setOuvertureError] = useState('');
 
-  // Fetch joueurs when tab = joueurs and filters change
+  // Reset page on filter change
+  useEffect(() => { setPage(1); }, [filters]);
+
+  // Fetch joueurs on mount and whenever filters change
   useEffect(() => {
-    if (tab !== 'joueurs' || filters === null) return;
+    if (filters === null) return;
     setJoueurState('loading');
-    setPage(1);
     fetchJoueurs({
       nom:     filters.joueur   || undefined,
       pays:    filters.pays     || undefined,
@@ -67,20 +69,17 @@ export const ResultsTabs: React.FC<ResultsTabsProps> = ({
     })
       .then(data => { setJoueurs(data); setJoueurState('idle'); })
       .catch(e => { setJoueurError(e.message); setJoueurState('error'); });
-  }, [tab, filters]);
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch tournois when tab = tournois and filters change
+  // Fetch tournois on mount and whenever filters change
   useEffect(() => {
-    if (tab !== 'tournois' || filters === null) return;
+    if (filters === null) return;
     setTournoiState('loading');
-    setPage(1);
-    let req = fetchTournois({
+    fetchTournois({
       pays:  filters.pays      || undefined,
       debut: filters.dateDebut || undefined,
       fin:   filters.dateFin   || undefined,
-    });
-    // client-side filter by tournoi ID if selected
-    req
+    })
       .then(data => {
         const filtered = filters.tournoi
           ? data.filter(t => String(t.id) === filters.tournoi)
@@ -89,31 +88,25 @@ export const ResultsTabs: React.FC<ResultsTabsProps> = ({
         setTournoiState('idle');
       })
       .catch(e => { setTournoiError(e.message); setTournoiState('error'); });
-  }, [tab, filters]);
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch ouvertures when tab = ouvertures and filters change
+  // Fetch ouvertures on mount and whenever filters change
   useEffect(() => {
-    if (tab !== 'ouvertures' || filters === null) return;
+    if (filters === null) return;
     setOuvertureState('loading');
-    setPage(1);
 
-    if (filters.joueur) {
-      fetchJoueurOuvertures(filters.joueur)
-        .then(data => { setOuvertures(data); setOuvertureState('idle'); })
-        .catch(e => { setOuvertureError(e.message); setOuvertureState('error'); });
-    } else if (filters.tournoi) {
-      fetchTournoiStats(Number(filters.tournoi))
-        .then(stats => { setOuvertures(stats.topOuvertures || []); setOuvertureState('idle'); })
-        .catch(e => { setOuvertureError(e.message); setOuvertureState('error'); });
-    } else if (filters.pays) {
-      fetchOuverturesByPays(filters.pays)
-        .then(data => { setOuvertures(data); setOuvertureState('idle'); })
-        .catch(e => { setOuvertureError(e.message); setOuvertureState('error'); });
-    } else {
-      setOuvertures([]);
-      setOuvertureState('idle');
-    }
-  }, [tab, filters]);
+    const promise = filters.joueur
+      ? fetchJoueurOuvertures(filters.joueur)
+      : filters.tournoi
+        ? fetchTournoiStats(Number(filters.tournoi)).then(s => s.topOuvertures || [])
+        : filters.pays
+          ? fetchOuverturesByPays(filters.pays)
+          : fetchOuvertures();
+
+    promise
+      .then(data => { setOuvertures(data); setOuvertureState('idle'); })
+      .catch(e => { setOuvertureError(e.message); setOuvertureState('error'); });
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function switchTab(t: TabType) {
     setTab(t);
@@ -190,7 +183,6 @@ export const ResultsTabs: React.FC<ResultsTabsProps> = ({
         {tab === 'joueurs' && (
           joueurState === 'loading' ? <Spinner /> :
           joueurState === 'error'   ? <Empty message={`Erreur : ${joueurError}`} /> :
-          filters === null          ? <Empty message="Utilisez les filtres et cliquez sur Rechercher" /> :
           joueurs.length === 0      ? <Empty message="Aucun joueur trouvé" /> :
           <>
             <div style={{
@@ -212,7 +204,6 @@ export const ResultsTabs: React.FC<ResultsTabsProps> = ({
         {tab === 'tournois' && (
           tournoiState === 'loading' ? <Spinner /> :
           tournoiState === 'error'   ? <Empty message={`Erreur : ${tournoiError}`} /> :
-          filters === null           ? <Empty message="Utilisez les filtres et cliquez sur Rechercher" /> :
           tournois.length === 0      ? <Empty message="Aucun tournoi trouvé" /> :
           <>
             <div style={{
@@ -234,10 +225,7 @@ export const ResultsTabs: React.FC<ResultsTabsProps> = ({
         {tab === 'ouvertures' && (
           ouvertureState === 'loading' ? <Spinner /> :
           ouvertureState === 'error'   ? <Empty message={`Erreur : ${ouvertureError}`} /> :
-          filters === null             ? <Empty message="Utilisez les filtres et cliquez sur Rechercher" /> :
-          (!filters.joueur && !filters.tournoi && !filters.pays)
-            ? <Empty message="Sélectionnez un joueur, un tournoi ou un pays" /> :
-          ouvertures.length === 0 ? <Empty message="Aucune ouverture trouvée" /> :
+          ouvertures.length === 0      ? <Empty message="Aucune ouverture trouvée" /> :
           <div style={{
             background: 'var(--c0)',
             border: '1px solid var(--c3)',

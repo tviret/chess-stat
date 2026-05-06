@@ -18,12 +18,16 @@ interface HomePageProps {
   onTournoiClick: (id: number, nom: string) => void;
 }
 
+const EMPTY_FILTERS: FilterState = {
+  joueur: '', pays: '', tournoi: '', eloMin: '', eloMax: '', dateDebut: '', dateFin: '',
+};
+
 export const HomePage: React.FC<HomePageProps> = ({
   filters, onFiltersChange, onSearch, onPlayerClick, onTournoiClick,
 }) => {
   const [paysList, setPaysList]       = useState<ApiPays[]>([]);
   const [tournoiList, setTournoiList] = useState<ApiTournoi[]>([]);
-  const [applied, setApplied]         = useState<FilterState | null>(null);
+  const [applied, setApplied]         = useState<FilterState | null>(EMPTY_FILTERS);
 
   // Populate sidebar selects on mount
   useEffect(() => {
@@ -42,11 +46,8 @@ export const HomePage: React.FC<HomePageProps> = ({
   }, [filters, onFiltersChange]);
 
   const handleReset = useCallback(() => {
-    const empty: FilterState = {
-      joueur: '', pays: '', tournoi: '', eloMin: '', eloMax: '', dateDebut: '', dateFin: '',
-    };
-    onFiltersChange(empty);
-    setApplied(null);
+    onFiltersChange(EMPTY_FILTERS);
+    setApplied({ ...EMPTY_FILTERS });
   }, [onFiltersChange]);
 
   function handleHeroSearch(query: string) {

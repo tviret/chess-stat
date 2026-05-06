@@ -74,6 +74,10 @@ export function fetchTournoiParticipations(id: number): Promise<ApiParticipation
   return get('/api/tournois/' + id + '/participations');
 }
 
+export function fetchOuvertures(): Promise<ApiOuverture[]> {
+  return get('/api/ouvertures');
+}
+
 export function fetchOuverturesByPays(pays: string): Promise<ApiOuverture[]> {
   return get('/api/stats/ouvertures?pays=' + pays);
 }
