@@ -29,6 +29,7 @@ export interface ApiTournoi {
   date: string | null;
   pays: { code: string } | null;
   nbrJoueurs: number | null;
+  nbrParties: number | null;
   classementMoyen: number | null;
 }
 
@@ -51,7 +52,10 @@ export interface ApiOuverture {
 
 export interface ApiParticipation {
   id: number;
-  joueur: { nomComplet: string; pays?: { code: string; nom?: string } | null } | null;
+  joueur: {
+    nomComplet: string;
+    pays?: { code: string; nom?: string } | null;
+  } | null;
   tournoi: { id: number; nom: string } | null;
   elo: number | null;
   pointsMarques: number | null;
@@ -59,8 +63,14 @@ export interface ApiParticipation {
 
 export interface ApiPartie {
   id: number;
-  joueurBlancs: { nomComplet: string; pays?: { code: string; nom?: string } | null } | null;
-  joueurNoirs:  { nomComplet: string; pays?: { code: string; nom?: string } | null } | null;
+  joueurBlancs: {
+    nomComplet: string;
+    pays?: { code: string; nom?: string } | null;
+  } | null;
+  joueurNoirs: {
+    nomComplet: string;
+    pays?: { code: string; nom?: string } | null;
+  } | null;
   resultat: number | null;
   ouverture: { codeEco: string; libelle: string } | null;
   tournoi: { id: number; nom: string } | null;
@@ -80,8 +90,8 @@ export interface FilterState {
   dateFin: string;
 }
 
-export type TabType = 'joueurs' | 'tournois' | 'ouvertures';
-export type PageType = 'home' | 'player' | 'tournament';
+export type TabType = "joueurs" | "tournois" | "ouvertures";
+export type PageType = "home" | "player" | "tournament" | "admin";
 
 export interface StatItem {
   value: string;
