@@ -27,12 +27,11 @@ public class JoueurService {
 
     public List<JoueurDto> search(String nom, String pays, Long tournoi, Integer eloMin, Integer eloMax) {
         return joueurRepository.search(
-                nom   != null && !nom.isBlank()   ? nom   : null,
-                pays  != null && !pays.isBlank()  ? pays  : null,
+                nom != null && !nom.isBlank() ? nom : null,
+                pays != null && !pays.isBlank() ? pays : null,
                 tournoi,
                 eloMin,
-                eloMax
-        ).stream().map(this::toDto).toList();
+                eloMax).stream().map(this::toDto).toList();
     }
 
     public JoueurStatsDto getStats(String nomComplet) {
@@ -41,12 +40,12 @@ public class JoueurService {
 
         List<Partie> parties = partieRepository.findByJoueur(nomComplet);
 
-        long nbParties   = parties.size();
-        long nbVictoires = parties.stream().filter(p ->
-                (p.getJoueurBlancs().getNomComplet().equals(nomComplet) && p.getResultat() ==  1) ||
-                (p.getJoueurNoirs() .getNomComplet().equals(nomComplet) && p.getResultat() == -1)
-        ).count();
-        long nbNulles   = parties.stream().filter(p -> p.getResultat() == 0).count();
+        long nbParties = parties.size();
+        long nbVictoires = parties.stream()
+                .filter(p -> (p.getJoueurBlancs().getNomComplet().equals(nomComplet) && p.getResultat() == 1) ||
+                        (p.getJoueurNoirs().getNomComplet().equals(nomComplet) && p.getResultat() == -1))
+                .count();
+        long nbNulles = parties.stream().filter(p -> p.getResultat() == 0).count();
         long nbDefaites = nbParties - nbVictoires - nbNulles;
 
         double tauxVictoire = nbParties > 0 ? (double) nbVictoires / nbParties * 100 : 0;
@@ -70,16 +69,16 @@ public class JoueurService {
                 .build();
     }
 
-    public List<PartieDto> getParties(String nomComplet){
+    public List<PartieDto> getParties(String nomComplet) {
         Joueur joueur = joueurRepository.findByNomComplet(nomComplet)
-            .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + nomComplet));
+                .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + nomComplet));
 
         List<Partie> parties = partieRepository.findByJoueur(nomComplet);
 
         return parties.stream().map(this::partieToDto).toList();
     }
 
-    public List<TournoiDto> getTournoisJoueur(String nomComplet){
+    public List<TournoiDto> getTournoisJoueur(String nomComplet) {
         Joueur joueur = joueurRepository.findByNomComplet(nomComplet)
                 .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + nomComplet));
 
@@ -87,7 +86,36 @@ public class JoueurService {
 
         return tournois.stream().map(tournoi -> TournoiService.toDto(tournoi)).toList();
 
+    }
 
+    public JoueurDto findById(Long id) {
+        Joueur joueur = joueurRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + id));
+        return toDto(joueur);
+    }
+
+    public JoueurDto save(JoueurDto dto) {
+        Joueur joueur = Joueur.builder()
+                .nomComplet(dto.getNomComplet())
+                .pays(dto.getPays() != null ? paysService.findEntityByCode(dto.getPays().getCode()) : null)
+                .build();
+        Joueur saved = joueurRepository.save(joueur);
+        return toDto(saved);
+    }
+
+    public JoueurDto update(Long id, JoueurDto dto) {
+        Joueur joueur = joueurRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Joueur introuvable : " + id));
+        joueur.setNomComplet(dto.getNomComplet());
+        if (dto.getPays() != null) {
+            joueur.setPays(paysService.findEntityByCode(dto.getPays().getCode()));
+        }
+        Joueur updated = joueurRepository.save(joueur);
+        return toDto(updated);
+    }
+
+    public void delete(Long id) {
+        joueurRepository.deleteById(id);
     }
 
     public JoueurDto toDto(Joueur joueur) {

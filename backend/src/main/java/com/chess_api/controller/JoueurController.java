@@ -16,22 +16,21 @@ import java.util.List;
 public class JoueurController {
 
     private final JoueurService joueurService;
-    private final StatsService  statsService;
+    private final StatsService statsService;
 
     // GET /api/joueurs
     // GET /api/joueurs?nom=Magnus
     // GET /api/joueurs?pays=no
     // GET /api/joueurs?tournoi=3
     // GET /api/joueurs?eloMin=2500&eloMax=2800
-    // GET /api/joueurs?pays=no&tournoi=3&eloMin=2500   ← combinaisons
+    // GET /api/joueurs?pays=no&tournoi=3&eloMin=2500 ← combinaisons
     @GetMapping
     public ResponseEntity<List<JoueurDto>> findAll(
-            @RequestParam(required = false) String  nom,
-            @RequestParam(required = false) String  pays,
-            @RequestParam(required = false) Long    tournoi,
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String pays,
+            @RequestParam(required = false) Long tournoi,
             @RequestParam(required = false) Integer eloMin,
-            @RequestParam(required = false) Integer eloMax
-    ) {
+            @RequestParam(required = false) Integer eloMax) {
         return ResponseEntity.ok(joueurService.search(nom, pays, tournoi, eloMin, eloMax));
     }
 
@@ -57,9 +56,34 @@ public class JoueurController {
     @GetMapping("/{nomComplet}/ouvertures")
     public ResponseEntity<List<OuvertureStatsDto>> getOuvertures(
             @PathVariable String nomComplet,
-            @RequestParam(required = false, defaultValue = "false") boolean detail
-    ) {
-        if (detail) return ResponseEntity.ok(statsService.getOuverturesStatsForJoueur(nomComplet));
+            @RequestParam(required = false, defaultValue = "false") boolean detail) {
+        if (detail)
+            return ResponseEntity.ok(statsService.getOuverturesStatsForJoueur(nomComplet));
         return ResponseEntity.ok(statsService.getTopOuverturesByJoueur(nomComplet));
+    }
+
+    // GET /api/joueurs/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<JoueurDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(joueurService.findById(id));
+    }
+
+    // POST /api/joueurs
+    @PostMapping
+    public ResponseEntity<JoueurDto> create(@RequestBody JoueurDto dto) {
+        return ResponseEntity.ok(joueurService.save(dto));
+    }
+
+    // PUT /api/joueurs/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<JoueurDto> update(@PathVariable Long id, @RequestBody JoueurDto dto) {
+        return ResponseEntity.ok(joueurService.update(id, dto));
+    }
+
+    // DELETE /api/joueurs/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        joueurService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

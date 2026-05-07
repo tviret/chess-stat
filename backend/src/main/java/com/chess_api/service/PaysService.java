@@ -26,6 +26,39 @@ public class PaysService {
                 .orElseThrow(() -> new RuntimeException("Pays introuvable : " + code));
     }
 
+    public Pays findEntityByCode(String code) {
+        return paysRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Pays introuvable : " + code));
+    }
+
+    public PaysDto findById(Long id) {
+        return paysRepository.findById(id)
+                .map(PaysService::toDto)
+                .orElseThrow(() -> new RuntimeException("Pays introuvable : " + id));
+    }
+
+    public PaysDto save(PaysDto dto) {
+        Pays pays = Pays.builder()
+                .nom(dto.getNom())
+                .code(dto.getCode())
+                .build();
+        Pays saved = paysRepository.save(pays);
+        return toDto(saved);
+    }
+
+    public PaysDto update(Long id, PaysDto dto) {
+        Pays pays = paysRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pays introuvable : " + id));
+        pays.setNom(dto.getNom());
+        pays.setCode(dto.getCode());
+        Pays updated = paysRepository.save(pays);
+        return toDto(updated);
+    }
+
+    public void delete(Long id) {
+        paysRepository.deleteById(id);
+    }
+
     public static PaysDto toDto(Pays pays) {
         return PaysDto.builder()
                 .code(pays.getCode())

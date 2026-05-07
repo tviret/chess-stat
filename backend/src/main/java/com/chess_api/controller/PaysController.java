@@ -27,4 +27,29 @@ public class PaysController {
     public ResponseEntity<PaysDto> findByCode(@PathVariable String code) {
         return ResponseEntity.ok(paysService.findByCode(code));
     }
+
+    // GET /api/pays/id/{id}
+    @GetMapping("/id/{id}")
+    public ResponseEntity<PaysDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(paysService.findById(id));
+    }
+
+    // POST /api/pays
+    @PostMapping
+    public ResponseEntity<PaysDto> create(@RequestBody PaysDto dto) {
+        return ResponseEntity.ok(paysService.save(dto));
+    }
+
+    // PUT /api/pays/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<PaysDto> update(@PathVariable Long id, @RequestBody PaysDto dto) {
+        return ResponseEntity.ok(paysService.update(id, dto));
+    }
+
+    // DELETE /api/pays/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        paysService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

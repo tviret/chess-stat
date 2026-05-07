@@ -24,14 +24,13 @@ public class TournoiController {
     // GET /api/tournois?nom=Open
     // GET /api/tournois?pays=fr
     // GET /api/tournois?debut=2024-01-01&fin=2024-12-31
-    // GET /api/tournois?pays=fr&debut=2024-01-01   ← combinaisons
+    // GET /api/tournois?pays=fr&debut=2024-01-01 ← combinaisons
     @GetMapping
     public ResponseEntity<List<TournoiDto>> findAll(
-            @RequestParam(required = false) String    nom,
-            @RequestParam(required = false) String    pays,
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String pays,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin
-    ) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
         return ResponseEntity.ok(tournoiService.search(nom, pays, debut, fin));
     }
 
@@ -45,5 +44,30 @@ public class TournoiController {
     @GetMapping("/{id}/participations")
     public ResponseEntity<List<ParticipationDto>> getParticipations(@PathVariable Long id) {
         return ResponseEntity.ok(tournoiService.getParticipations(id));
+    }
+
+    // GET /api/tournois/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<TournoiDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(tournoiService.findById(id));
+    }
+
+    // POST /api/tournois
+    @PostMapping
+    public ResponseEntity<TournoiDto> create(@RequestBody TournoiDto dto) {
+        return ResponseEntity.ok(tournoiService.save(dto));
+    }
+
+    // PUT /api/tournois/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<TournoiDto> update(@PathVariable Long id, @RequestBody TournoiDto dto) {
+        return ResponseEntity.ok(tournoiService.update(id, dto));
+    }
+
+    // DELETE /api/tournois/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        tournoiService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
